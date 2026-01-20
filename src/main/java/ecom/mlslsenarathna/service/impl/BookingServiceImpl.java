@@ -25,8 +25,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public UserResponseDTO registerNewBooking(BookingDTO bookingDTO) {
-
-
         UserDTO userDTO=userService.getUserById(bookingDTO.getUserId());
         EventDTO eventDTO=eventService.getEventByID(bookingDTO.getEventId());
         double price=priceCalculatorService.calculatePrice(userDTO,eventDTO);
@@ -77,8 +75,22 @@ public class BookingServiceImpl implements BookingService {
                     price,
                     entity.getStatus()
             );
+        }else{
+            seatDTO.setStatus("AVAILABLE");
+            seatDTO.setExpiry(null);
+            entity.setStatus("CANCLED");
+            bookingRepository.save(entity);
+            seatService.updateSeatInfo(seatDTO);
+            return new UserResponseDTO(
+                    userDTO.getUserName(),
+                    entity.getEventId(),
+                    seatDTO.getSeatId(),
+                    eventDTO.getEventDate(),
+                    price,
+                    entity.getStatus()
+            );
         }
-        return null;
+
 
     }
 

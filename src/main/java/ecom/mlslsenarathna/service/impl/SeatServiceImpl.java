@@ -3,6 +3,7 @@ package ecom.mlslsenarathna.service.impl;
 import ecom.mlslsenarathna.annotation.AuditFailure;
 import ecom.mlslsenarathna.model.dto.SeatDTO;
 import ecom.mlslsenarathna.model.entity.SeatEntity;
+import ecom.mlslsenarathna.repository.BookingRepository;
 import ecom.mlslsenarathna.repository.SeatRepository;
 import ecom.mlslsenarathna.service.SeatService;
 import jakarta.transaction.Transactional;
@@ -20,6 +21,7 @@ import java.util.Optional;
 @Slf4j
 public class SeatServiceImpl implements SeatService {
     final SeatRepository seatRepository;
+    final BookingRepository bookingRepository;
     ModelMapper mapper=new ModelMapper();
     public List<SeatDTO> getSeatList(){
         List<SeatEntity> seatList=seatRepository.findAll();
@@ -118,6 +120,7 @@ public class SeatServiceImpl implements SeatService {
             long now = System.currentTimeMillis();
 
             int updatedCount = seatRepository.releaseExpiredSeats(now);
+            int cancelledBookings = bookingRepository.cancelExpiredPendingBookings(now);
 
             if (updatedCount > 0) {
                 log.info("Cleanup Service: Released {} expired seat holds.", updatedCount);
