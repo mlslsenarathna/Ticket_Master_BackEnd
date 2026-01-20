@@ -9,10 +9,12 @@ import org.springframework.stereotype.Service;
 public class PriceCalculatorServiceImpl implements PriceCalculatorService {
     @Override
     public double calculatePrice(UserDTO userDTO, EventDTO eventDTO) {
+        System.out.println(eventDTO.getPrice());
+        System.out.println(eventDTO.getPrice()*0.9);
         if(userDTO.getTier().equalsIgnoreCase("REGULAR")){
             return eventDTO.getPrice();
         }else if(userDTO.getTier().equalsIgnoreCase("VIP")&& eventDTO.isHighDemand()==true){
-            return eventDTO.getPrice()*0.9;
+            return ((eventDTO.getPrice())*0.9);
         }else if(userDTO.getTier().equalsIgnoreCase("PLATINUM")){
             return eventDTO.getPrice();
         }

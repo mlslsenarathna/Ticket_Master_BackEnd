@@ -21,7 +21,6 @@ public class AuditAspect {
     @AfterThrowing(pointcut = "@annotation(ecom.mlslsenarathna.annotation.AuditFailure)", throwing = "ex")
     public void logBookingFailure(JoinPoint joinPoint, Exception ex) {
 
-
         Object[] args = joinPoint.getArgs();
         String userId = (args.length > 1) ? args[1].toString() : "UNKNOWN";
 
@@ -30,9 +29,7 @@ public class AuditAspect {
         log.setReason(ex.getMessage());
         log.setTimestamp(LocalDateTime.now());
         log.setMethodName(joinPoint.getSignature().getName());
-
         auditLogRepository.save(log);
 
-        System.out.println("Audit Shadow logged a failure for user: " + userId);
     }
 }

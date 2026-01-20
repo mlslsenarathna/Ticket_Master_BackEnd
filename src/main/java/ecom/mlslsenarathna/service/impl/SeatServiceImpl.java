@@ -5,16 +5,15 @@ import ecom.mlslsenarathna.model.dto.SeatDTO;
 import ecom.mlslsenarathna.model.entity.SeatEntity;
 import ecom.mlslsenarathna.repository.SeatRepository;
 import ecom.mlslsenarathna.service.SeatService;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +40,41 @@ public class SeatServiceImpl implements SeatService {
 
         }
         return availableList;
+    }
+    @Override
+    public List<SeatDTO> getSoldSeatList() {
+        List<SeatDTO> seatDTOList=getSeatList();
+        List<SeatDTO> soldList=null;
+        for(SeatDTO seatDTO:seatDTOList){
+            if(seatDTO.getStatus().equalsIgnoreCase("SOLD")){
+                soldList.add(seatDTO);
+            }
+
+        }
+        return soldList;
+    }
+    @Override
+    public int getEventSeatSizeEventID(String eventId) {
+        List<SeatDTO>  soldlist=getSoldSeatList();
+        int count=0;
+        for(SeatDTO seatDTO:soldlist){
+            if(seatDTO.getEventID().equalsIgnoreCase(eventId)){
+              count++;
+            }
+        }
+        return count;
+    }
+
+    @Override
+    public List<SeatDTO> getSoldSeatListByEventID(String eventId) {
+        List<SeatDTO>  soldlist=getSoldSeatList();
+        List<SeatDTO> soldEventList=null;
+        for(SeatDTO seatDTO:soldlist){
+            if(seatDTO.getEventID().equalsIgnoreCase(eventId)){
+                soldEventList.add(seatDTO);
+            }
+        }
+        return soldEventList;
     }
 
     @Override

@@ -1,0 +1,10 @@
+http://localhost:8888/booking/newBooking
+{
+  "bookingId": "BOK-2026-012",
+  "userId": "S0002",
+  "eventId": "EVT-001",
+  "seatId": "S-201",
+  "amount_paid": 13500.0,
+  "status": "PENDING"
+}
+http://localhost:8888/booking/completeBooking/{BOK-2026-011}

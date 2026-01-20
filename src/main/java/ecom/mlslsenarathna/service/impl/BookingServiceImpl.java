@@ -2,7 +2,6 @@ package ecom.mlslsenarathna.service.impl;
 
 import ecom.mlslsenarathna.model.dto.*;
 import ecom.mlslsenarathna.model.entity.BookingEntity;
-import ecom.mlslsenarathna.model.entity.SeatEntity;
 import ecom.mlslsenarathna.repository.BookingRepository;
 import ecom.mlslsenarathna.service.*;
 import jakarta.transaction.Transactional;
@@ -21,6 +20,7 @@ public class BookingServiceImpl implements BookingService {
     final UserService userService;
     final EventService eventService;
     final PriceCalculatorService priceCalculatorService;
+
     ModelMapper mapper=new ModelMapper();
     @Override
     @Transactional
@@ -55,6 +55,7 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
+    @Transactional
     public UserResponseDTO completeBooking(String id, String status) {
         Optional<BookingEntity> bookingEntity=bookingRepository.findById(id);
         BookingEntity entity=bookingEntity.orElseThrow();
@@ -82,13 +83,4 @@ public class BookingServiceImpl implements BookingService {
     }
 
 
-
-//    @Override
-//    public BookingDTO updateStatus(String status,String bookingId){
-//       Optional<BookingEntity> bookingEntity=bookingRepository.findById(bookingId);
-//       BookingEntity entity=bookingEntity.orElseThrow();
-//       entity.setStatus(status);
-//       bookingRepository.save(entity);
-//       return mapper.map(entity,BookingDTO.class);
-//    }
-}
+    }

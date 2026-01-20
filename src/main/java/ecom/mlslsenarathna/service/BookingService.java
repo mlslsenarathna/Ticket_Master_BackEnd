@@ -8,4 +8,6 @@ public interface BookingService {
 
     UserResponseDTO completeBooking(String id, String status);
 
+
+
 }

@@ -7,6 +7,9 @@ import java.util.List;
 
 public interface SeatService {
     List<SeatDTO> getAvailableSeatList();
+    List<SeatDTO> getSoldSeatList();
+    List<SeatDTO> getSoldSeatListByEventID(String eventId);
+    int getEventSeatSizeEventID(String eventId);
 
     SeatDTO getSeatByID(String seatId);
 
