@@ -9,4 +9,6 @@ public interface UserService {
     void registrationNewUser(UserDTO userDTO);
 
     String getNewUserId();
+
+    UserDTO getUserById(String userId);
 }

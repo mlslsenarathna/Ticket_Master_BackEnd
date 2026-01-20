@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
@@ -24,6 +26,14 @@ public class EventServiceImpl implements EventService {
     public String getNextEventID() {
         EventEntity eventEntity=eventRepository.findTopByOrderByEventIdDesc();
         return  nextID(mapper.map(eventEntity,EventDTO.class));
+    }
+
+    @Override
+    public EventDTO getEventByID(String eventId) {
+        Optional<EventEntity> eventEntity=eventRepository.findById(eventId);
+        EventEntity entity=eventEntity.orElseThrow();
+        return mapper.map(entity,EventDTO.class);
+
     }
 
     private String nextID(EventDTO map) {

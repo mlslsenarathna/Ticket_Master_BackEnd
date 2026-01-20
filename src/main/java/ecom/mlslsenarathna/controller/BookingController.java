@@ -1,0 +1,28 @@
+package ecom.mlslsenarathna.controller;
+
+import ecom.mlslsenarathna.model.dto.BookingDTO;
+import ecom.mlslsenarathna.model.dto.UserResponseDTO;
+import ecom.mlslsenarathna.service.BookingService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/booking")
+@RequiredArgsConstructor
+public class BookingController {
+    final BookingService bookingService;
+    @PostMapping("/booking")
+    public UserResponseDTO NewBooking(@RequestBody BookingDTO bookingDTO){
+        return bookingService.registerNewBooking(bookingDTO);
+    }
+    @PostMapping("/updateBooking/{id}")
+    public  void updateBookingStatus(@PathVariable String id,@RequestParam("status")String status){
+        bookingService.completeBooking(id,status);
+    }
+    @PutMapping("/completeBooking/{id}")
+    public UserResponseDTO completeBooking(@PathVariable String id){
+       return  bookingService.completeBooking(id,"COMPLETE");
+    }
+
+
+}

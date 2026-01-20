@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserSeriviceImpl implements UserService {
@@ -22,6 +24,13 @@ public class UserSeriviceImpl implements UserService {
     public String getNewUserId() {
         UserEntity userEntity=userRepository.findTopByOrderByUserIdDesc();
         return nextID(mapper.map(userEntity,UserDTO.class));
+    }
+
+    @Override
+    public UserDTO getUserById(String userId) {
+        Optional<UserEntity> user=userRepository.findById(userId);
+        UserEntity userEntity=user.orElseThrow();
+        return mapper.map(userEntity,UserDTO.class);
     }
 
     private String nextID(UserDTO map) {

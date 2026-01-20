@@ -6,4 +6,6 @@ public interface EventService {
     void newEventRegistration(EventDTO eventDTO);
 
     String getNextEventID();
+
+    EventDTO getEventByID(String eventId);
 }
