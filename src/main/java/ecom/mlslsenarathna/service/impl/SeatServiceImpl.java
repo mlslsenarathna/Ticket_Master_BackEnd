@@ -6,8 +6,11 @@ import ecom.mlslsenarathna.model.entity.SeatEntity;
 import ecom.mlslsenarathna.repository.SeatRepository;
 import ecom.mlslsenarathna.service.SeatService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SeatServiceImpl implements SeatService {
     final SeatRepository seatRepository;
     ModelMapper mapper=new ModelMapper();
@@ -53,6 +57,7 @@ public class SeatServiceImpl implements SeatService {
 
     @Override
     @AuditFailure
+    @Transactional
     public SeatDTO holdSeat(String seatId, String userId) throws SeatLockedException {
         SeatEntity seat = seatRepository.findByIdWithLock(seatId)
                 .orElseThrow(() -> new RuntimeException("Seat not found"));
@@ -72,4 +77,17 @@ public class SeatServiceImpl implements SeatService {
             throw new SeatLockedException(remainingSeconds);
         }
     }
+
+        @Scheduled(fixedRate = 60000)
+        @Transactional
+        public void releaseExpiredHolds() {
+            long now = System.currentTimeMillis();
+
+            int updatedCount = seatRepository.releaseExpiredSeats(now);
+
+            if (updatedCount > 0) {
+                log.info("Cleanup Service: Released {} expired seat holds.", updatedCount);
+            }
+        }
+
 }

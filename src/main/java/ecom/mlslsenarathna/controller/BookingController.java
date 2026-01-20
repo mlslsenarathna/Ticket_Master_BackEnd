@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class BookingController {
     final BookingService bookingService;
-    @PostMapping("/booking")
+    @PostMapping("/newBooking")
     public UserResponseDTO NewBooking(@RequestBody BookingDTO bookingDTO){
         return bookingService.registerNewBooking(bookingDTO);
     }

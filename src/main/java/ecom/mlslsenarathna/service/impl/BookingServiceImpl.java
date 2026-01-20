@@ -5,6 +5,7 @@ import ecom.mlslsenarathna.model.entity.BookingEntity;
 import ecom.mlslsenarathna.model.entity.SeatEntity;
 import ecom.mlslsenarathna.repository.BookingRepository;
 import ecom.mlslsenarathna.service.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,10 @@ public class BookingServiceImpl implements BookingService {
     final PriceCalculatorService priceCalculatorService;
     ModelMapper mapper=new ModelMapper();
     @Override
+    @Transactional
     public UserResponseDTO registerNewBooking(BookingDTO bookingDTO) {
-        bookingRepository.save(mapper.map(bookingDTO,BookingEntity.class));
+
+
         UserDTO userDTO=userService.getUserById(bookingDTO.getUserId());
         EventDTO eventDTO=eventService.getEventByID(bookingDTO.getEventId());
         double price=priceCalculatorService.calculatePrice(userDTO,eventDTO);
@@ -31,18 +34,23 @@ public class BookingServiceImpl implements BookingService {
         if(seatDTO.getStatus().equalsIgnoreCase("AVAILABLE")){
             try {
                 seatService.holdSeat(seatDTO.getSeatId(),userDTO.getUserId());
+                bookingRepository.save(mapper.map(bookingDTO,BookingEntity.class));
+                return new UserResponseDTO(
+                        userDTO.getUserName(),
+                        bookingDTO.getEventId(),
+                        seatDTO.getSeatId(),
+                        eventDTO.getEventDate(),
+                        price,
+                        seatDTO.getStatus()
+                );
             } catch (SeatLockedException e) {
                 throw new RuntimeException(e);
             }
         }
-        return new UserResponseDTO(
-                userDTO.getUserName(),
-                bookingDTO.getEventId(),
-                seatDTO.getSeatId(),
-                eventDTO.getEventDate(),
-                price,
-                bookingDTO.getStatus()
-                );
+
+        return null;
+
+
     }
 
 
@@ -54,18 +62,23 @@ public class BookingServiceImpl implements BookingService {
         UserDTO userDTO=userService.getUserById(entity.getUserId());
         EventDTO eventDTO=eventService.getEventByID(entity.getEventId());
         double price=priceCalculatorService.calculatePrice(userDTO,eventDTO);
-        if(seatDTO.getStatus().equalsIgnoreCase("AVAILABLE")){
+        if(seatDTO.getStatus().equalsIgnoreCase("HELD")){
             seatDTO.setStatus("SOLD");
+            seatDTO.setExpiry(null);
+            entity.setStatus("CONFIRMED");
+            bookingRepository.save(entity);
             seatService.updateSeatInfo(seatDTO);
+            return new UserResponseDTO(
+                    userDTO.getUserName(),
+                    entity.getEventId(),
+                    seatDTO.getSeatId(),
+                    eventDTO.getEventDate(),
+                    price,
+                    entity.getStatus()
+            );
         }
-        return new UserResponseDTO(
-                userDTO.getUserName(),
-                entity.getEventId(),
-                seatDTO.getSeatId(),
-                eventDTO.getEventDate(),
-                price,
-                entity.getStatus()
-        );
+        return null;
+
     }
 
 
