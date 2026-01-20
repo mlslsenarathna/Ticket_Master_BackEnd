@@ -28,11 +28,17 @@ public class BookingServiceImpl implements BookingService {
         EventDTO eventDTO=eventService.getEventByID(bookingDTO.getEventId());
         double price=priceCalculatorService.calculatePrice(userDTO,eventDTO);
         SeatDTO seatDTO=seatService.getSeatByID(bookingDTO.getSeatId());
-
+        if(seatDTO.getStatus().equalsIgnoreCase("AVAILABLE")){
+            try {
+                seatService.holdSeat(seatDTO.getSeatId(),userDTO.getUserId());
+            } catch (SeatLockedException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return new UserResponseDTO(
                 userDTO.getUserName(),
                 bookingDTO.getEventId(),
-                bookingDTO.getSeatId(),
+                seatDTO.getSeatId(),
                 eventDTO.getEventDate(),
                 price,
                 bookingDTO.getStatus()
@@ -42,12 +48,24 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public UserResponseDTO completeBooking(String id, String status) {
-        SeatDTO seatDTO= seatService.getSeatByID(id);
+        Optional<BookingEntity> bookingEntity=bookingRepository.findById(id);
+        BookingEntity entity=bookingEntity.orElseThrow();
+        SeatDTO seatDTO= seatService.getSeatByID(entity.getSeatId());
+        UserDTO userDTO=userService.getUserById(entity.getUserId());
+        EventDTO eventDTO=eventService.getEventByID(entity.getEventId());
+        double price=priceCalculatorService.calculatePrice(userDTO,eventDTO);
         if(seatDTO.getStatus().equalsIgnoreCase("AVAILABLE")){
-            seatDTO.setStatus("BOOKED");
+            seatDTO.setStatus("SOLD");
+            seatService.updateSeatInfo(seatDTO);
         }
-        seatService.updateSeatInfo(seatDTO);
-        return null;
+        return new UserResponseDTO(
+                userDTO.getUserName(),
+                entity.getEventId(),
+                seatDTO.getSeatId(),
+                eventDTO.getEventDate(),
+                price,
+                entity.getStatus()
+        );
     }
 
 

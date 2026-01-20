@@ -21,6 +21,7 @@ public class SeatEntity{
     private String seatNumber;
     private String status;
     private String userId;
-    private LocalDateTime expiry;
+    private Long expiry;
+
 
 }

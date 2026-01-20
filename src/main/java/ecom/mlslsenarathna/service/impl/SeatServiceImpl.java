@@ -1,5 +1,6 @@
 package ecom.mlslsenarathna.service.impl;
 
+import ecom.mlslsenarathna.annotation.AuditFailure;
 import ecom.mlslsenarathna.model.dto.SeatDTO;
 import ecom.mlslsenarathna.model.entity.SeatEntity;
 import ecom.mlslsenarathna.repository.SeatRepository;
@@ -48,5 +49,27 @@ public class SeatServiceImpl implements SeatService {
     @Override
     public void updateSeatInfo(SeatDTO seatDTO) {
         seatRepository.save(mapper.map(seatDTO,SeatEntity.class));
+    }
+
+    @Override
+    @AuditFailure
+    public SeatDTO holdSeat(String seatId, String userId) throws SeatLockedException {
+        SeatEntity seat = seatRepository.findByIdWithLock(seatId)
+                .orElseThrow(() -> new RuntimeException("Seat not found"));
+        long now = System.currentTimeMillis();
+        boolean isAvailable = "AVAILABLE".equalsIgnoreCase(seat.getStatus());
+        boolean isExpired = (seat.getExpiry() != null && now > seat.getExpiry());
+
+        if (isAvailable || isExpired) {
+            seat.setStatus("HELD");
+            seat.setUserId(userId);
+            seat.setExpiry(now+ (10 * 60 * 1000));
+            SeatEntity savedSeat = seatRepository.save(seat);
+            return mapper.map(savedSeat, SeatDTO.class);
+        } else {
+
+            long remainingSeconds = Math.max(0, (seat.getExpiry() - now) / 1000);
+            throw new SeatLockedException(remainingSeconds);
+        }
     }
 }

@@ -1,0 +1,7 @@
+package ecom.mlslsenarathna.repository;
+
+import ecom.mlslsenarathna.model.entity.AuditLogEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AuditLogRepository extends JpaRepository<AuditLogEntity,Long> {
+}

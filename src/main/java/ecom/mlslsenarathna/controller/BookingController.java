@@ -15,13 +15,9 @@ public class BookingController {
     public UserResponseDTO NewBooking(@RequestBody BookingDTO bookingDTO){
         return bookingService.registerNewBooking(bookingDTO);
     }
-    @PostMapping("/updateBooking/{id}")
-    public  void updateBookingStatus(@PathVariable String id,@RequestParam("status")String status){
-        bookingService.completeBooking(id,status);
-    }
     @PutMapping("/completeBooking/{id}")
     public UserResponseDTO completeBooking(@PathVariable String id){
-       return  bookingService.completeBooking(id,"COMPLETE");
+       return  bookingService.completeBooking(id,"CONFIRMED");
     }
 
 
